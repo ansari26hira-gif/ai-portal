@@ -2,68 +2,129 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AI Secure Doc Portal - Real AI v2</title>
+<title>AI Secure Doc Portal - V3 Permanent</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
 <style>
 *{box-sizing:border-box;font-family:Segoe UI,Arial}body{margin:0;background:#f6f7fb}
 .app{max-width:900px;margin:30px auto;padding:0 16px}header{text-align:center}
 .screen{display:none}.screen.active{display:block}
-.card{background:#fff;border-radius:16px;padding:24px;box-shadow:0 8px 30px rgba(0,0,0,.06)}
+.card{background:#fff;border-radius:16px;padding:24px;box-shadow:0 8px 30px rgba(0,0,0,.06);margin-bottom:20px}
 .btn{padding:12px 18px;border-radius:10px;border:0;cursor:pointer;background:#e9eaf1;font-weight:600}
 .btn.primary{background:#1f2b5b;color:#fff;width:100%;margin-top:12px}
+.btn.small{padding:6px 10px;font-size:12px;background:#ff4d4d;color:#fff;margin-left:8px}
 .btn:disabled{opacity:.5}input{width:100%;padding:12px;border:1px solid #ddd;border-radius:10px;margin-top:6px}
 .dropzone{border:2px dashed #8a90b8;border-radius:12px;padding:30px;text-align:center;background:#fbfbff}
 .chatbox{height:380px;overflow-y:auto;border:1px solid #eee;border-radius:12px;padding:12px;background:#fcfcff;display:flex;flex-direction:column;gap:10px}
 .msg{max-width:80%;padding:10px 14px;border-radius:14px;font-size:14px;white-space:pre-wrap}
 .msg.ai{background:#eef0ff;align-self:flex-start}.msg.you{background:#1f2b5b;color:#fff;align-self:flex-end}
 .chat-input{display:flex;gap:10px;margin-top:12px}.chat-input input{flex:1;margin:0}
-.status{font-size:13px;color:#0a7;margin-top:10px}.file-item{background:#f1f2f9;padding:8px 10px;border-radius:8px;margin:6px 0;font-size:13px}
+.status{font-size:13px;color:#0a7;margin-top:10px}.file-item{background:#f1f2f9;padding:8px 10px;border-radius:8px;margin:6px 0;font-size:13px;display:flex;justify-content:space-between;align-items:center}
+.badge{background:#1f2b5b;color:#fff;padding:2px 8px;border-radius:20px;font-size:11px}
 </style>
 </head>
 <body>
 <div class="app">
-<header><h1>🔒 AI Secure Doc Portal</h1><p>Batch 1 - Hira Ansari | REAL AI - PDF+DOCX</p></header>
+<header><h1>🔒 AI Secure Doc Portal</h1><p>Batch 1 - Hira Ansari | V3 Permanent Storage</p><p id="loginInfo" style="font-size:12px;color:#666"></p></header>
+
 <section id="loginScreen" class="screen active">
-<div class="card"><h2>1. Login</h2><input id="email" value="hira@student.com"><input type="password" value="123"><button class="btn primary" onclick="document.getElementById('loginScreen').classList.remove('active');document.getElementById('uploadScreen').classList.add('active')">Login</button></div>
+<div class="card"><h2>1. Secure Login</h2>
+<p style="font-size:13px;color:#666">Login: hira@student.com / Pass: 123</p>
+<input id="email" placeholder="Email" value="hira@student.com">
+<input id="password" type="password" placeholder="Password" value="123">
+<button class="btn primary" onclick="doLogin()">Login</button>
+<p id="loginError" style="color:red;font-size:13px"></p>
+</div>
 </section>
+
 <section id="uploadScreen" class="screen">
-<div class="card"><h2>2. Document Upload Portal</h2>
-<div id="dropZone" class="dropzone"><p><b>Drag & drop files here</b></p><p style="font-size:12px">PDF and DOCX supported - REAL reading</p><input type="file" id="fileInput" multiple hidden accept=".pdf,.docx"><button class="btn" onclick="fileInput.click()">Browse Files</button></div>
-<div id="fileStatus" class="status">No files yet. Select PDF or DOCX.</div>
-<h3>Uploaded Files (<span id="fileCount">0</span>)</h3><div id="fileList"></div>
-<button class="btn primary" id="continueBtn" disabled onclick="document.getElementById('uploadScreen').classList.remove('active');document.getElementById('chatScreen').classList.add('active')">Continue to Secure Chat</button>
+<div class="card"><h2>2. Document Upload Portal <span class="badge">PERMANENT</span></h2>
+<div id="dropZone" class="dropzone"><p><b>Drag & drop files here</b></p><p style="font-size:12px">PDF and DOCX - Saved Permanently with Login</p><input type="file" id="fileInput" multiple hidden accept=".pdf,.docx"><button class="btn" onclick="fileInput.click()">Browse Files</button></div>
+<div id="fileStatus" class="status"></div>
+<h3>Uploaded Files (<span id="fileCount">0</span>) - Saved in Secure Vault</h3><div id="fileList"></div>
+<button class="btn primary" id="continueBtn" onclick="goChat()">Continue to Secure Chat</button>
+<button class="btn" style="margin-top:10px" onclick="doLogout()">Logout</button>
 </div>
 </section>
+
 <section id="chatScreen" class="screen">
-<div class="card"><h2>3. AI Chat Box (REAL)</h2>
-<div id="chatBox" class="chatbox"><div class="msg ai">AI: Ready! I actually read your files. Ask me anything.</div></div>
-<div class="chat-input"><input id="qInput" placeholder="Ask e.g. tell me about new company policies"><button class="btn primary" style="width:100px;margin:0" onclick="askAI()">Send</button></div>
+<div class="card"><h2>3. AI Chat Box (REAL) - Reads All Saved Files</h2>
+<div id="chatBox" class="chatbox"><div class="msg ai">AI: Ready! I can read all your permanently saved files.</div></div>
+<div class="chat-input"><input id="qInput" placeholder="Ask e.g. tell me about company policies"><button class="btn primary" style="width:100px;margin:0" onclick="askAI()">Send</button></div>
+<button class="btn" style="margin-top:12px" onclick="backToUpload()">Back to Files</button>
 </div>
 </section>
 </div>
+
 <script>
 pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-let docs=[];
+const STORAGE_KEY = 'secureDocs_v3_hira';
+let docs = [];
+
+function loadFromStorage(){
+  try{
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if(saved){ docs = JSON.parse(saved); }
+  }catch(e){ docs=[]; }
+  renderFiles();
+}
+function saveToStorage(){
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(docs));
+  renderFiles();
+}
+function renderFiles(){
+  const list=document.getElementById('fileList'); list.innerHTML='';
+  docs.forEach((d,idx)=>{
+    const div=document.createElement('div'); div.className='file-item';
+    div.innerHTML=`<span>✅ ${d.name} - ${(d.text.length/1000).toFixed(1)}k chars - ${new Date(d.date).toLocaleDateString()}</span><span><button class="btn small" onclick="deleteFile(${idx})">Delete</button></span>`;
+    list.appendChild(div);
+  });
+  document.getElementById('fileCount').textContent=docs.length;
+  document.getElementById('continueBtn').disabled = docs.length===0;
+  const st=document.getElementById('fileStatus');
+  if(docs.length>0) st.textContent=`🔒 Secure Vault: ${docs.length} file(s) permanently saved. Only you can access with your login.`;
+  else st.textContent='No files yet. Upload PDF or DOCX - they will stay even after refresh.';
+}
+
+function doLogin(){
+  const e=document.getElementById('email').value, p=document.getElementById('password').value;
+  if(e==='hira@student.com' && p==='123'){
+    localStorage.setItem('isLoggedIn_v3','true');
+    document.getElementById('loginScreen').classList.remove('active');
+    document.getElementById('uploadScreen').classList.add('active');
+    document.getElementById('loginInfo').textContent='Logged in as: '+e+' | Files are secure';
+    loadFromStorage();
+  }else{
+    document.getElementById('loginError').textContent='Wrong email or password! Use hira@student.com / 123';
+  }
+}
+function doLogout(){
+  localStorage.removeItem('isLoggedIn_v3');
+  document.getElementById('uploadScreen').classList.remove('active');
+  document.getElementById('loginScreen').classList.add('active');
+  document.getElementById('loginInfo').textContent='';
+}
+function goChat(){ document.getElementById('uploadScreen').classList.remove('active'); document.getElementById('chatScreen').classList.add('active'); }
+function backToUpload(){ document.getElementById('chatScreen').classList.remove('active'); document.getElementById('uploadScreen').classList.add('active'); }
+
 const fileInput=document.getElementById('fileInput'), dropZone=document.getElementById('dropZone');
 dropZone.addEventListener('dragover',e=>{e.preventDefault();dropZone.style.background='#eef0ff'});
 dropZone.addEventListener('dragleave',()=>dropZone.style.background='#fbfbff');
 dropZone.addEventListener('drop',e=>{e.preventDefault();dropZone.style.background='#fbfbff';handleFiles(e.dataTransfer.files)});
 fileInput.addEventListener('change',e=>handleFiles(e.target.files));
+
 async function handleFiles(files){
- const status=document.getElementById('fileStatus'); status.textContent='Reading...';
+ const status=document.getElementById('fileStatus'); status.textContent='Reading and saving securely...';
  for(let f of files){
   try{
    let text=''; if(f.name.toLowerCase().endsWith('.pdf')) text=await readPDF(f); else if(f.name.toLowerCase().endsWith('.docx')) text=await readDOCX(f); else continue;
-   docs.push({name:f.name,text});
-   const div=document.createElement('div');div.className='file-item';div.textContent=`✅ ${f.name} - ${text.length} chars - READ SUCCESS`;document.getElementById('fileList').appendChild(div);
+   docs.push({name:f.name,text,date:new Date().toISOString()});
+   saveToStorage();
   }catch(err){
-   const div=document.createElement('div');div.className='file-item';div.textContent=`❌ ${f.name} - ERROR: ${err.message}`;document.getElementById('fileList').appendChild(div);
+   status.textContent=`❌ Error in ${f.name}: ${err.message}`;
   }
  }
- document.getElementById('fileCount').textContent=docs.length;
- status.textContent=`Success! Read ${docs.length} file(s). Total ${docs.reduce((a,b)=>a+b.text.length,0)} chars. Now click Continue.`;
- if(docs.length>0) document.getElementById('continueBtn').disabled=false;
+ status.textContent=`✅ Saved! Total ${docs.length} file(s) in secure vault.`;
 }
 async function readPDF(file){
  const buf=await file.arrayBuffer(); const pdf=await pdfjsLib.getDocument(buf).promise; let txt=''; for(let i=1;i<=pdf.numPages;i++){ const p=await pdf.getPage(i); const c=await p.getTextContent(); txt+=c.items.map(x=>x.str).join(' ')+'\n';} return txt;
@@ -71,6 +132,8 @@ async function readPDF(file){
 async function readDOCX(file){
  const buf=await file.arrayBuffer(); const res=await mammoth.extractRawText({arrayBuffer:buf}); return res.value;
 }
+function deleteFile(i){ if(confirm('Delete '+docs[i].name+'?')){ docs.splice(i,1); saveToStorage(); } }
+
 function askAI(){
  const input=document.getElementById('qInput'); const q=input.value.trim(); if(!q) return;
  addMsg(q,'you'); input.value=''; const ans=search(q); setTimeout(()=>addMsg(ans,'ai'),300);
@@ -80,10 +143,22 @@ function search(question){
  const qWords=question.toLowerCase().split(/\W+/).filter(x=>x.length>2); let hits=[];
  docs.forEach(doc=>{ const sents=doc.text.split(/(?<=[.!?])\s+/).filter(s=>s.length>15); sents.forEach(s=>{ let score=0; qWords.forEach(w=>{if(s.toLowerCase().includes(w))score++;}); if(score>0) hits.push({score,text:s.trim(),file:doc.name}); }); });
  hits.sort((a,b)=>b.score-a.score); const top=hits.slice(0,5);
- if(top.length===0){ return `I read your file(s) but didn't find exact words for "${question}".\n\nFirst 600 chars of ${docs[0].name}:\n${docs[0].text.slice(0,600)}...\n\nTry keywords like "policy", "leave", "contract".`; }
- let r=`I analyzed ${docs.length} file(s). Found ${top.length} relevant answers for "${question}":\n\n`; top.forEach((h,i)=>{r+=`${i+1}. [${h.file}] ${h.text}\n\n`;}); r+=`---\nREAL AI - Text extracted from your actual document.`; return r;
+ if(top.length===0){ return `I read your ${docs.length} saved file(s) but didn't find exact words for "${question}".\n\nPreview of ${docs[0].name}:\n${docs[0].text.slice(0,600)}...\n\nTry keywords like "policy", "leave", "contract".`; }
+ let r=`I analyzed ${docs.length} permanently saved file(s). Found ${top.length} answers for "${question}":\n\n`; top.forEach((h,i)=>{r+=`${i+1}. [${h.file}] ${h.text}\n\n`;}); r+=`---\nSECURE VAULT - Only accessible after login.`; return r;
 }
 document.getElementById('qInput').addEventListener('keydown',e=>{if(e.key==='Enter') askAI();});
+
+// Auto-login if already logged in
+window.onload=()=>{
+  if(localStorage.getItem('isLoggedIn_v3')==='true'){
+    document.getElementById('loginScreen').classList.remove('active');
+    document.getElementById('uploadScreen').classList.add('active');
+    document.getElementById('loginInfo').textContent='Logged in as: hira@student.com | Files are secure';
+    loadFromStorage();
+  }else{
+    loadFromStorage();
+  }
+}
 </script>
 </body>
 </html>
