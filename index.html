@@ -3,32 +3,144 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AI-Powered Secure Document Search Portal</title>
-<link rel="stylesheet" href="style.css">
+<title>AI Secure Doc Portal - Real AI</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<style>
+*{box-sizing:border-box;font-family:Inter,Segoe UI,Arial}
+body{margin:0;background:#f6f7fb;color:#111}
+.app{max-width:900px;margin:30px auto;padding:0 16px}
+header{text-align:center;margin:30px 0}
+header h1{font-size:32px;margin:0}
+.screen{display:none}.screen.active{display:block}
+.card{background:#fff;border-radius:16px;padding:24px;box-shadow:0 8px 30px rgba(0,0,0,.06);margin-bottom:20px}
+.btn{padding:12px 18px;border-radius:10px;border:0;cursor:pointer;background:#e9eaf1;font-weight:600}
+.btn.primary{background:#1f2b5b;color:#fff;width:100%;margin-top:12px}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+input[type=email],input[type=password],.chat-input input{width:100%;padding:12px;border:1px solid #ddd;border-radius:10px;margin-top:6px}
+.dropzone{border:2px dashed #8a90b8;border-radius:12px;padding:30px;text-align:center;background:#fbfbff}
+.chatbox{height:380px;overflow-y:auto;border:1px solid #eee;border-radius:12px;padding:12px;background:#fcfcff;display:flex;flex-direction:column;gap:10px}
+.msg{max-width:80%;padding:10px 14px;border-radius:14px;font-size:14px;line-height:1.4}
+.msg.ai{background:#eef0ff;align-self:flex-start}
+.msg.you{background:#1f2b5b;color:#fff;align-self:flex-end}
+.chat-input{display:flex;gap:10px;margin-top:12px}
+.chat-input input{flex:1;margin:0}
+.status{font-size:13px;color:#555;margin-top:10px}
+.file-item{font-size:13px;background:#f1f2f9;padding:8px 10px;border-radius:8px;margin:6px 0}
+</style>
 </head>
 <body>
 <div class="app">
-<header><h1>🔒 AI Secure Doc Portal</h1><p>Batch 1 - Web Dev | Hira Ansari</p></header>
+<header><h1>🔒 AI Secure Doc Portal</h1><p>Batch 1 - Web Dev | Hira Ansari | REAL AI MODE</p></header>
+
 <section id="loginScreen" class="screen active">
 <div class="card"><h2>1. Login Screen</h2>
 <label>Email</label><input type="email" id="email" value="hira@student.com">
 <label>Password</label><input type="password" value="123456">
-<button class="btn primary" onclick="doLogin()">Login</button></div>
+<button class="btn primary" onclick="doLogin()">Login</button>
+</div>
 </section>
+
 <section id="uploadScreen" class="screen">
 <div class="card"><h2>2. Document Upload Portal</h2>
-<div id="dropZone" class="dropzone"><div>⬆</div><p><b>Drag & drop files here</b></p>
-<input type="file" id="fileInput" multiple hidden>
-<button class="btn" onclick="fileInput.click()">Browse Files</button></div>
-<h3>Uploaded Files (<span id="fileCount">0</span>)</h3><ul id="fileList"></ul>
-<button class="btn primary" id="continueBtn" onclick="goToChat()" disabled>Continue to Search</button></div>
+<div id="dropZone" class="dropzone"><div>📄</div><p><b>Drag & drop files here</b></p><p style="font-size:12px">PDF only - real text reading</p><input type="file" id="fileInput" multiple hidden accept=".pdf"><button class="btn" onclick="fileInput.click()">Browse Files</button></div>
+<div id="fileStatus" class="status"></div>
+<h3>Uploaded Files (<span id="fileCount">0</span>)</h3><div id="fileList"></div>
+<button class="btn primary" id="continueBtn" onclick="goToChat()" disabled>Continue to Secure Chat</button>
+</div>
 </section>
+
 <section id="chatScreen" class="screen">
-<div class="card"><h2>3. AI Chat Box</h2><div id="chatBox" class="chatbox"><div class="msg ai">AI: Hello Hira! Ask me about your docs</div></div>
-<div class="chat-input"><input type="text" id="qInput" placeholder="Ask..."><button class="btn primary" onclick="askAI()">Send</button></div>
+<div class="card"><h2>3. AI Chat Box (REAL)</h2>
+<div id="chatBox" class="chatbox">
+<div class="msg ai">AI: Hello Hira! I have READ your PDF. Ask me anything.</div>
+</div>
+<div class="chat-input"><input type="text" id="qInput" placeholder="Ask... e.g. tell me about new contract"><button class="btn primary" style="width:120px;margin:0" onclick="askAI()">Send</button></div>
 </div>
 </section>
 </div>
-<script src="script.js"></script>
+
+<script>
+pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+let documents = [];
+
+function doLogin(){
+  document.getElementById('loginScreen').classList.remove('active');
+  document.getElementById('uploadScreen').classList.add('active');
+}
+const dropZone = document.getElementById('dropZone');
+const fileInput = document.getElementById('fileInput');
+dropZone.addEventListener('dragover', e=>{e.preventDefault(); dropZone.style.background='#eef0ff'});
+dropZone.addEventListener('dragleave', ()=>{dropZone.style.background='#fbfbff'});
+dropZone.addEventListener('drop', e=>{e.preventDefault(); handleFiles(e.dataTransfer.files)});
+fileInput.addEventListener('change', e=> handleFiles(e.target.files));
+
+async function handleFiles(files){
+  const status = document.getElementById('fileStatus');
+  status.textContent = 'Reading PDFs...';
+  for(let file of files){
+    if(!file.name.toLowerCase().endsWith('.pdf')) continue;
+    const text = await extractPdfText(file);
+    documents.push({name: file.name, text});
+    const div = document.createElement('div'); div.className='file-item';
+    div.textContent = `✅ ${file.name} - ${text.length} chars read`;
+    document.getElementById('fileList').appendChild(div);
+  }
+  document.getElementById('fileCount').textContent = documents.length;
+  status.textContent = `Done! Read ${documents.length} file(s)`;
+  if(documents.length>0) document.getElementById('continueBtn').disabled=false;
+}
+async function extractPdfText(file){
+  const arrayBuffer = await file.arrayBuffer();
+  const pdf = await pdfjsLib.getDocument(arrayBuffer).promise;
+  let fullText='';
+  for(let i=1;i<=pdf.numPages;i++){
+    const page = await pdf.getPage(i);
+    const content = await page.getTextContent();
+    fullText += content.items.map(it=>it.str).join(' ') + '\n';
+  }
+  return fullText;
+}
+function goToChat(){
+  document.getElementById('uploadScreen').classList.remove('active');
+  document.getElementById('chatScreen').classList.add('active');
+}
+function askAI(){
+  const input = document.getElementById('qInput');
+  const q = input.value.trim(); if(!q) return;
+  addMsg(q, 'you'); input.value='';
+  if(documents.length===0){ addMsg('Upload PDF first.', 'ai'); return; }
+  const answer = searchInDocs(q);
+  setTimeout(()=> addMsg(answer, 'ai'), 300);
+}
+function addMsg(text, who){
+  const box = document.getElementById('chatBox');
+  const div = document.createElement('div');
+  div.className = 'msg ' + who;
+  div.textContent = (who==='you' ? 'You: ' : 'AI: ') + text;
+  box.appendChild(div); box.scrollTop = box.scrollHeight;
+}
+function searchInDocs(question){
+  const qWords = question.toLowerCase().split(/\W+/).filter(w=>w.length>2);
+  let bestHits = [];
+  documents.forEach(doc=>{
+    const sentences = doc.text.split(/(?<=[.!?])\s+/).filter(s=>s.length>20);
+    sentences.forEach(sent=>{
+      const lower = sent.toLowerCase();
+      let score = 0; qWords.forEach(w=>{ if(lower.includes(w)) score++; });
+      if(score>0) bestHits.push({score, text: sent.trim(), file: doc.name});
+    });
+  });
+  bestHits.sort((a,b)=>b.score-a.score);
+  const top = bestHits.slice(0,4);
+  if(top.length===0){
+    return `I read '${documents[0].name}' but no exact match for "${question}". Here is start of doc: ${documents[0].text.slice(0,500)}...`;
+  }
+  let response = `I analyzed ${documents.length} file(s). Found ${top.length} parts for "${question}":\n\n`;
+  top.forEach((h,i)=>{ response += `${i+1}. [From ${h.file}] ${h.text}\n\n`; });
+  response += `(REAL PDF text, not demo)`;
+  return response;
+}
+document.getElementById('qInput').addEventListener('keydown', e=>{ if(e.key==='Enter') askAI(); });
+</script>
 </body>
 </html>
