@@ -1,0 +1,15 @@
+*{box-sizing:border-box;font-family:system-ui}
+body{margin:0;background:#f6f7fb}
+.app{max-width:1100px;margin:auto;padding:16px}
+header{text-align:center}
+.screen{display:none}.screen.active{display:block}
+.card{background:#fff;border:1px solid #ddd;border-radius:16px;padding:20px;max-width:520px;margin:auto}
+input{width:100%;padding:12px;border:1px solid #ccc;border-radius:10px}
+.btn{padding:10px 18px;border-radius:10px;border:1px solid #111;background:#fff;cursor:pointer;font-weight:600}
+.btn.primary{background:#111;color:#fff;width:100%;margin-top:12px}
+.dropzone{border:2px dashed #999;border-radius:14px;padding:20px;text-align:center;background:#fafafa}
+.chatbox{height:320px;overflow:auto;border:1px solid #ddd;border-radius:12px;padding:10px;display:flex;flex-direction:column;gap:8px}
+.msg{padding:10px;border-radius:10px;max-width:85%}
+.msg.user{align-self:flex-end;background:#111;color:#fff}
+.msg.ai{align-self:flex-start;background:#fff;border:1px solid #ddd}
+.chat-input{display:flex;gap:6px;margin-top:10px}
